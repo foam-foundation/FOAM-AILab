@@ -1,33 +1,34 @@
+# Neural Network Training Demystified: From Gradient Descent to a Language Model
+
+*By Vesna Urosev* · [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC_BY--NC--SA_4.0-lightgrey.svg)](../../LICENSE-CONTENT)
+
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-- [Neural Network Training Demystified: From Gradient Descent to a Language Model](#neural-network-training-demystified-from-gradient-descent-to-a-language-model)
-  - [1. The big picture](#1-the-big-picture)
-  - [2. Gradient descent](#2-gradient-descent)
-    - [The hill analogy](#the-hill-analogy)
-    - [What the gradient is](#what-the-gradient-is)
-    - [The update rule](#the-update-rule)
-    - [The learning rate](#the-learning-rate)
-    - [Back to the original example](#back-to-the-original-example)
-  - [3. Backpropagation](#3-backpropagation)
-    - [The key idea: the chain rule](#the-key-idea-the-chain-rule)
-    - [Two passes](#two-passes)
-    - [Credit assignment](#credit-assignment)
-    - [A worked example: a small two-layer network](#a-worked-example-a-small-two-layer-network)
-  - [4. Activation functions](#4-activation-functions)
-  - [5. From one prediction to a real training sample](#5-from-one-prediction-to-a-real-training-sample)
-  - [6. Putting it together](#6-putting-it-together)
-    - [The training loop](#the-training-loop)
-    - [Common variants](#common-variants)
-    - [Common pitfalls](#common-pitfalls)
-    - [Summary](#summary)
-  - [Appendix A: Rotary position embeddings in detail](#appendix-a-rotary-position-embeddings-in-detail)
-  - [References](#references)
+- [1. The big picture](#1-the-big-picture)
+- [2. Gradient descent](#2-gradient-descent)
+  - [The hill analogy](#the-hill-analogy)
+  - [What the gradient is](#what-the-gradient-is)
+  - [The update rule](#the-update-rule)
+  - [The learning rate](#the-learning-rate)
+  - [Back to the original example](#back-to-the-original-example)
+- [3. Backpropagation](#3-backpropagation)
+  - [The key idea: the chain rule](#the-key-idea-the-chain-rule)
+  - [Two passes](#two-passes)
+  - [Credit assignment](#credit-assignment)
+  - [A worked example: a small two-layer network](#a-worked-example-a-small-two-layer-network)
+- [4. Activation functions](#4-activation-functions)
+- [5. From one prediction to a real training sample](#5-from-one-prediction-to-a-real-training-sample)
+- [6. Putting it together](#6-putting-it-together)
+  - [The training loop](#the-training-loop)
+  - [Common variants](#common-variants)
+  - [Common pitfalls](#common-pitfalls)
+  - [Summary](#summary)
+- [Appendix A: Rotary position embeddings in detail](#appendix-a-rotary-position-embeddings-in-detail)
+- [References](#references)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
-# Neural Network Training Demystified: From Gradient Descent to a Language Model
 
 **Before you start.** This guide builds everything up step by step, with a worked example for each idea.
 
