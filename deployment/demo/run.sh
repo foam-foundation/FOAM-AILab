@@ -1,4 +1,11 @@
 #!/bin/bash
+#
+# @license
+# Copyright 2026 FOAM Foundation and contributors
+# SPDX-License-Identifier: Apache-2.0
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+
 # run from classes/ and serve with http on port 8080
 node foam3/tools/build.js -Jdemo "$@"
 

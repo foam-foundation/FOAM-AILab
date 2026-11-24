@@ -7,12 +7,12 @@ p({
   "keywords": [ "aILab" ],
   "serviceScript": """
     return new foam.dao.EasyDAO.Builder(x)
-      .setOf(com.foam.ailab.AILab.getOwnClassInfo())
+      .setOf(com.foamdev.ailab.AILab.getOwnClassInfo())
       .setPm(true)
       .setSeqNo(true)
       .setAuthorize(false)
       .setJournalType(foam.dao.JournalType.SINGLE_JOURNAL)
       .build();
   """,
-  "client": `{"of":"com.foam.ailab.AILab"}`
+  "client": `{"of":"com.foamdev.ailab.AILab"}`
 })

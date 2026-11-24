@@ -1,13 +1,25 @@
+/**
+ * @license
+ * Copyright 2026 FOAM Foundation and contributors
+ * SPDX-License-Identifier: Apache-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.POM({
   name: 'aILab',
   excludes: [ '*' ],
   projects: [
     { name: 'foam3/pom'},
-    { name: 'src/com/foam/ailab/pom'},
+    { name: 'src/com/foamdev/ailab/pom'},
     { name: 'journals/pom' }
   ],
   licenses: `
-    // Add your license header here
+  /**
+   * @license
+   * Copyright 2026 FOAM Foundation and contributors
+   * SPDX-License-Identifier: Apache-2.0
+   * http://www.apache.org/licenses/LICENSE-2.0
+  */
   `,
   envs: {
     version: '1.0.0',
@@ -15,7 +27,7 @@ foam.POM({
   },
   tasks: [
     function javaManifest() {
-      JAVA_MANIFEST_VENDOR_ID = 'ailab.foam.com';
+      JAVA_MANIFEST_VENDOR_ID = 'ailab.foamdev.com';
     }
   ]
 });
