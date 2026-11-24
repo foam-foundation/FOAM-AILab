@@ -20,6 +20,21 @@
   - [A worked example: a small two-layer network](#a-worked-example-a-small-two-layer-network)
 - [4. Activation functions](#4-activation-functions)
 - [5. From one prediction to a real training sample](#5-from-one-prediction-to-a-real-training-sample)
+  - [The sample](#the-sample)
+  - [Step 1: Format and tokenize](#step-1-format-and-tokenize)
+    - [Tokenizers: how text becomes numbers](#tokenizers-how-text-becomes-numbers)
+  - [Step 2: Inputs and targets (teacher forcing)](#step-2-inputs-and-targets-teacher-forcing)
+  - [Step 3: Two different masks](#step-3-two-different-masks)
+    - [The causal mask: what each position can see](#the-causal-mask-what-each-position-can-see)
+    - [The loss mask: which predictions are scored](#the-loss-mask-which-predictions-are-scored)
+  - [Step 4: Inside the forward pass](#step-4-inside-the-forward-pass)
+    - [Putting it together](#putting-it-together)
+    - [Tensor shapes along the way](#tensor-shapes-along-the-way)
+  - [Step 5: The loss for each token](#step-5-the-loss-for-each-token)
+  - [Step 6: Start the backward pass at the softmax](#step-6-start-the-backward-pass-at-the-softmax)
+  - [Step 7: Run backprop and add up](#step-7-run-backprop-and-add-up)
+  - [Step 8: One update](#step-8-one-update)
+  - [What "batch size" means](#what-batch-size-means)
 - [6. Putting it together](#6-putting-it-together)
   - [The training loop](#the-training-loop)
   - [Common variants](#common-variants)
@@ -635,7 +650,9 @@ LLMs are usually trained in stages. First comes **pretraining** on huge amounts 
 
 We'll use Alpaca \[5\], the simplest: one request, one answer. Let's follow a single Alpaca sample through one training step of a language model. The batch contains only this one sample.
 
-**The sample.** An Alpaca record has three fields: **instruction** (the request), **input** (optional extra context, often empty) and **output** (the answer the model should learn to give). Here is one concrete record, as it is stored in the dataset:
+### The sample
+
+An Alpaca record has three fields: **instruction** (the request), **input** (optional extra context, often empty) and **output** (the answer the model should learn to give). Here is one concrete record, as it is stored in the dataset:
 
 ```json
 {
@@ -645,7 +662,9 @@ We'll use Alpaca \[5\], the simplest: one request, one answer. Let's follow a si
 }
 ```
 
-**Step 1: Format and tokenize.** The model never sees separate fields like the ones above: all it ever reads is one continuous piece of text. So the first step is to reformat each raw record from the dataset into a single text, using a fixed prompt template that every sample shares. The Alpaca template is a short preamble, then an "### Instruction:" header followed by the instruction, then a "### Response:" header followed by the output. (When a record's input isn't empty, it gets its own "### Input:" section in between.)
+### Step 1: Format and tokenize
+
+The model never sees separate fields like the ones above: all it ever reads is one continuous piece of text. So the first step is to reformat each raw record from the dataset into a single text, using a fixed prompt template that every sample shares. The Alpaca template is a short preamble, then an "### Instruction:" header followed by the instruction, then a "### Response:" header followed by the output. (When a record's input isn't empty, it gets its own "### Input:" section in between.)
 
 Filled in, the template for our sample looks like this. The instruction field goes under "### Instruction:", and the output field becomes the text under "### Response:". During tokenization, which is the next step, two special markers are also added: \<s> (beginning of sequence) at the very start, and \</s> (end of sequence) right after the response, so the model also learns when to stop:
 
@@ -661,7 +680,9 @@ The capital of France is Paris.</s>
 
 Next, the whole text is split into tokens (words and word pieces), and each token is mapped to an integer id from the model's vocabulary, which has tens of thousands of entries.
 
-**Tokenizers: how text becomes numbers.** A model can't read letters; it reads integer ids. A **tokenizer** is a fixed lookup, built before the model is trained, that cuts text into pieces from a fixed vocabulary and maps each piece to an id. There are three broad approaches:
+#### Tokenizers: how text becomes numbers
+
+A model can't read letters; it reads integer ids. A **tokenizer** is a fixed lookup, built before the model is trained, that cuts text into pieces from a fixed vocabulary and maps each piece to an id. There are three broad approaches:
 
 - **Word-level:** one token per word. Simple, but the vocabulary becomes enormous, and any word not in it becomes an "unknown" token.
 - **Character-level:** one token per character. The vocabulary is tiny and nothing is ever unknown, but sequences get very long and each token carries little meaning.
@@ -716,7 +737,9 @@ Other popular subword algorithms:
 
 These ids are all the model receives, and on its own an id is just a row number with no meaning. So the first thing the model does is replace each id with a vector for that token, called its **embedding**: in LLaMA-7B, a list of 4,096 numbers. The id simply says which row of a big matrix inside the model to read. So id 3681 is replaced by the 4,096 numbers stored in row 3681, the embedding for ▁Paris, and from then on the model works only with these vectors. Unlike the tokenizer's lookup above, which is fixed once it's built, the numbers in this matrix are weights that are learned during training. We'll look at embeddings more closely in Step 4 (② Embedding).
 
-**Step 2: Inputs and targets (teacher forcing).** A language model is trained to predict the next token. So the input is the token sequence, and the target at each position is simply the token that comes next: the same sequence, shifted by one. During training the model always reads the correct earlier tokens, never its own guesses. This is called **teacher forcing**. It means a text of n tokens gives n − 1 predictions, all made in a single forward pass. Here are five positions from the start of our response:
+### Step 2: Inputs and targets (teacher forcing)
+
+A language model is trained to predict the next token. So the input is the token sequence, and the target at each position is simply the token that comes next: the same sequence, shifted by one. During training the model always reads the correct earlier tokens, never its own guesses. This is called **teacher forcing**. It means a text of n tokens gives n − 1 predictions, all made in a single forward pass. Here are five positions from the start of our response:
 
 ![Teacher forcing: inputs and targets for five positions of our sample](images/06a-teacher-forcing.png)
 
@@ -728,9 +751,13 @@ These ids are all the model receives, and on its own an id is just a row number 
 | … | … | … |
 | . | the prompt + the whole response | end of sequence |
 
-**Step 3: Two different masks.** Two separate things in training are called a "mask". They do different jobs, so it helps to keep them apart.
+### Step 3: Two different masks
 
-**The causal mask: what each position can see.** Inside attention (Step 4), each position decides how much to draw on every token in the sequence. To talk about this we need two labels: **i** for the position doing the looking, and **j** for the token it looks at. For each pair, the model works out one number, z\_ij: how relevant token j is to position i. For example, if i is the position reading ▁is and j is ▁France, then z\_ij says how much ▁is should draw on ▁France. Where does z come from? It isn't random, and it isn't one of the model weights: it is computed fresh on every forward pass, from the two tokens' vectors and some learned weight matrices (it is large when the two vectors match well). ③ in Step 4 shows exactly how. For the mask, all that matters is that there is one z for every pair of tokens. This plays the same role as the pre-activation z in section 4: a weighted sum, computed first, and then passed through a function. Here the function is the softmax, which turns all of position i's numbers into attention weights that add up to 1. The causal mask sets z\_ij to minus infinity for every token that comes after position i (j > i), hence masks them before the softmax is applied:
+Two separate things in training are called a "mask". They do different jobs, so it helps to keep them apart.
+
+#### The causal mask: what each position can see
+
+Inside attention (Step 4), each position decides how much to draw on every token in the sequence. To talk about this we need two labels: **i** for the position doing the looking, and **j** for the token it looks at. For each pair, the model works out one number, z\_ij: how relevant token j is to position i. For example, if i is the position reading ▁is and j is ▁France, then z\_ij says how much ▁is should draw on ▁France. Where does z come from? It isn't random, and it isn't one of the model weights: it is computed fresh on every forward pass, from the two tokens' vectors and some learned weight matrices (it is large when the two vectors match well). ③ in Step 4 shows exactly how. For the mask, all that matters is that there is one z for every pair of tokens. This plays the same role as the pre-activation z in section 4: a weighted sum, computed first, and then passed through a function. Here the function is the softmax, which turns all of position i's numbers into attention weights that add up to 1. The causal mask sets z\_ij to minus infinity for every token that comes after position i (j > i), hence masks them before the softmax is applied:
 
 $$
 \begin{aligned}
@@ -759,7 +786,9 @@ In shot, a position gets no information at all from any later token. Without thi
 
 The whole sequence still goes through as one matrix, but each position behaves as if the tokens after it don't exist. That is also exactly the situation the model faces later when it generates text, one token at a time.
 
-**The loss mask: which predictions are scored.** We want the model to learn to write responses, not to recite instructions. So every position whose target is part of the prompt gets an "ignore" label (−100 in PyTorch and Hugging Face code). Those positions are still read as context, but their predictions add nothing to the loss. Only positions whose target is part of the response count:
+#### The loss mask: which predictions are scored
+
+We want the model to learn to write responses, not to recite instructions. So every position whose target is part of the prompt gets an "ignore" label (−100 in PyTorch and Hugging Face code). Those positions are still read as context, but their predictions add nothing to the loss. Only positions whose target is part of the response count:
 
 | Position reads | Its target (next token) | Counted in the loss? |
 | --- | --- | --- |
@@ -777,7 +806,9 @@ The whole sequence still goes through as one matrix, but each position behaves a
 
 So, for our full example, only 8 response tokens are scored. In Hugging Face-style code, the loss mask is stored as a `labels` list: *a copy of the token ids in which every prompt token is replaced with −100.* To calculate the loss, this list is shifted one place to the left, so each position's label becomes the next token in the input: its target from Step 2.
 
-**Step 4: Inside the forward pass.** Language models like LLaMA are based on the Transformer, introduced in the 2017 paper "Attention Is All You Need" \[3\]. It is a stack of fairly simple parts. Here is the layout, read from the bottom up; each numbered part is explained below:
+### Step 4: Inside the forward pass
+
+Language models like LLaMA are based on the Transformer, introduced in the 2017 paper "Attention Is All You Need" \[3\]. It is a stack of fairly simple parts. Here is the layout, read from the bottom up; each numbered part is explained below:
 
 ![The parts of a language model, numbered as explained in the text](images/06d-model-parts.png)
 
@@ -978,13 +1009,17 @@ This is the same calculation that turned the z values into attention weights in 
 
 **⑥ Loss.** Cross-entropy compares those probabilities with the labels from Step 3, where only the response positions count, and gives one number, L. Step 5 looks at it in detail.
 
-**Putting it together.** Here is the same layout with the details filled in, and the backward pass that follows:
+#### Putting it together
+
+Here is the same layout with the details filled in, and the backward pass that follows:
 
 ![Simplified Transformer: one training step](images/07-transformer-training-step.png)
 
 **All positions at once.** Within a layer, no position waits for another: the whole sequence is stacked into a matrix, one row per token, and a few matrix multiplications compute every position together. The only waiting is between layers, so the forward pass takes as many sequential steps as there are layers, however long the text is. Thanks to teacher forcing and the causal mask, every prediction in the sample is made and scored in that one pass. Generating text later is different: the model produces one token at a time and feeds each one back in.
 
-**Tensor shapes along the way.** So far we have mostly followed one position at a time, as vectors and matrices. In practice the model works on all n positions of a sample at once (and usually on several samples at once), so its numbers are held in blocks with more dimensions. Machine learning libraries such as PyTorch and TensorFlow call any such block a **tensor**, and you will meet the word, and shapes written with commas, as soon as you read model code or papers. A tensor is just a block of numbers with any number of dimensions: a list of numbers (a vector), a grid (a matrix), a stack of grids, and so on. Its shape lists how many entries it has along each dimension. For example, \[1, n, 4096\] means 1 sample, n positions, and 4,096 numbers for each position. The picture below keeps it simple and follows just one position of one sample through a forward pass of LLaMA-7B: its main vector and the helper vectors made from it, each a single \[1 × d\] vector, with the bar showing its length d from ① to ⑤:
+#### Tensor shapes along the way
+
+So far we have mostly followed one position at a time, as vectors and matrices. In practice the model works on all n positions of a sample at once (and usually on several samples at once), so its numbers are held in blocks with more dimensions. Machine learning libraries such as PyTorch and TensorFlow call any such block a **tensor**, and you will meet the word, and shapes written with commas, as soon as you read model code or papers. A tensor is just a block of numbers with any number of dimensions: a list of numbers (a vector), a grid (a matrix), a stack of grids, and so on. Its shape lists how many entries it has along each dimension. For example, \[1, n, 4096\] means 1 sample, n positions, and 4,096 numbers for each position. The picture below keeps it simple and follows just one position of one sample through a forward pass of LLaMA-7B: its main vector and the helper vectors made from it, each a single \[1 × d\] vector, with the bar showing its length d from ① to ⑤:
 
 ![The shape journey: one position's vector through LLaMA-7B](images/07-1-shape-journey.png)
 
@@ -1001,7 +1036,9 @@ Now put the positions back together. Stacking the n positions of one sample as r
 
 The \[1, n, 4096\] example above is the main vector's tensor for a batch of one sample. The attention weights are the only row where n appears twice: every position has one weight for every position, the same grid as the causal mask in Step 3. At the very end, all these numbers collapse into the loss L, a single number.
 
-**Step 5: The loss for each token.** From ⑤, every position ends with a probability for every token in the vocabulary: 32,000 probabilities that add up to 1. For the loss we look at only one of them: the probability the model gave to the **target**, the token that really comes next (Step 2). We write it **p(target)**. For example, at the position reading ▁is the target is ▁Paris. In the toy example of ⑤ the model spread its probability as ▁Paris 0.694, ▁Lyon 0.155, ▁London 0.094 and ▁the 0.057. Only ▁Paris is the target, so p(target) = 0.694, and the other three values are not used directly. The loss at that position is called the **cross-entropy**: the negative natural logarithm ln of p(target).
+### Step 5: The loss for each token
+
+From ⑤, every position ends with a probability for every token in the vocabulary: 32,000 probabilities that add up to 1. For the loss we look at only one of them: the probability the model gave to the **target**, the token that really comes next (Step 2). We write it **p(target)**. For example, at the position reading ▁is the target is ▁Paris. In the toy example of ⑤ the model spread its probability as ▁Paris 0.694, ▁Lyon 0.155, ▁London 0.094 and ▁the 0.057. Only ▁Paris is the target, so p(target) = 0.694, and the other three values are not used directly. The loss at that position is called the **cross-entropy**: the negative natural logarithm ln of p(target).
 
 $$
 \text{loss} = -\ln p(\text{target})
@@ -1049,7 +1086,9 @@ This single number L plays the same role as the loss L in the earlier examples: 
 
 ![One Alpaca sample: 8 scored response tokens averaged into one loss](images/08-alpaca-token-losses.png)
 
-**Step 6: Start the backward pass at the softmax.** For softmax followed by cross-entropy, the gradient of one position's loss with respect to each logit has a famously simple form:
+### Step 6: Start the backward pass at the softmax
+
+For softmax followed by cross-entropy, the gradient of one position's loss with respect to each logit has a famously simple form:
 
 $$
 \frac{\partial \thinspace  \text{loss}}{\partial \thinspace  \text{logit}_k} = p_k - \begin{cases} 1 & \text{if } k \text{ is the target} \cr  0 & \text{otherwise} \end{cases}
@@ -1066,13 +1105,17 @@ This is the counterpart of ∂L/∂ŷ in the two-layer example. Take the positio
 
 Read it as: push the target's score up, and push every wrong token's score down in proportion to the probability it took. Because L is an average over 8 tokens, each of these is also divided by 8 (for example, −0.306 / 8 ≈ −0.038).
 
-**Step 7: Run backprop and add up.** From here, backprop runs exactly as in sections 3 and 4. The chain rule carries these signals back through every layer of the transformer, multiplying by local derivatives (activation slopes included) and using the values stored during the forward pass. What's new compared with the earlier examples is that one sample gives n scored predictions, in our case 8, and all 8 were made with the same weights: there is one set of query, key, value and other matrices, used at every position. So a single weight affects all 8 losses, and its gradient has to collect its effect on each of them. Since L is the average of the 8 losses, the weight's gradient is the average of its 8 separate gradients:
+### Step 7: Run backprop and add up
+
+From here, backprop runs exactly as in sections 3 and 4. The chain rule carries these signals back through every layer of the transformer, multiplying by local derivatives (activation slopes included) and using the values stored during the forward pass. What's new compared with the earlier examples is that one sample gives n scored predictions, in our case 8, and all 8 were made with the same weights: there is one set of query, key, value and other matrices, used at every position. So a single weight affects all 8 losses, and its gradient has to collect its effect on each of them. Since L is the average of the 8 losses, the weight's gradient is the average of its 8 separate gradients:
 
 $$
 \frac{\partial L}{\partial w} = \frac{1}{8} \left( \frac{\partial \thinspace  \text{loss}_1}{\partial w} + \frac{\partial \thinspace  \text{loss}_2}{\partial w} + \dots + \frac{\partial \thinspace  \text{loss}_8}{\partial w} \right)
 $$
 
-**Step 8: One update.** Finally, every weight in the model (often billions of them) takes one step:
+### Step 8: One update
+
+Finally, every weight in the model (often billions of them) takes one step:
 
 $$
 w \leftarrow w - \eta \thinspace  \frac{\partial L}{\partial w}
@@ -1092,7 +1135,9 @@ In practice, fine-tuning uses an optimizer like Adam \[11\] and a very small lea
 | A few weights, a small gradient vector per layer | Millions to billions of weights, each shared across positions |
 | One update per example | One update per batch |
 
-**What "batch size" means.** With this sample as the whole batch, one sample gives one update: the purest form of stochastic gradient descent, fast but noisy. With a batch of, say, 64 samples, the losses of all scored tokens across all 64 samples are averaged into one L. Then there is one backward pass and one update for the whole batch. The gradient is a smoother estimate, so each step is more reliable.
+### What "batch size" means
+
+With this sample as the whole batch, one sample gives one update: the purest form of stochastic gradient descent, fast but noisy. With a batch of, say, 64 samples, the losses of all scored tokens across all 64 samples are averaged into one L. Then there is one backward pass and one update for the whole batch. The gradient is a smoother estimate, so each step is more reliable.
 
 ## 6. Putting it together
 
