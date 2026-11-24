@@ -1,0 +1,31 @@
+p({
+  "class":"foam.core.auth.User",
+  "id":42,
+  "spid":"aILab",
+  "lifecycleState":1,
+  "group":"system",
+  "firstName":"admin",
+  "middleName":"",
+  "lastName":"admin",
+  "email":"admin@ailab.foam.com",
+  "userName":"admin",
+  "birthday":"1982-07-07T23:12:00.0Z",
+  "password":"uZt5i0UNipk=:dj1eX8E3liPaaqLLNXePoUOHW+pfyjbSDsAblDBGHJZqldHJEWUHPB/xNJAtqAYdhrpSGOZFJD0HVdVT83icpw==",
+  "emailVerified":true,
+  "loginEnabled":true
+})
+p({
+  "class":"foam.core.auth.User",
+  "id":43,
+  "spid":"aILab",
+  "lifecycleState":1,
+  "group":"anonymous",
+  "firstName":"Anonymous",
+  "lastName":"AILab",
+  "email":"anonymous-aILab@ailab.foam.com",
+  "userName":"anonymous-aILab",
+  "emailVerified":true,
+  "loginEnabled":false,
+  "compliance":2,
+  "isPublic":false
+})

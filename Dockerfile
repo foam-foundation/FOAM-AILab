@@ -1,0 +1,59 @@
+# Runs AILab in a container.
+#
+# Run:    docker compose up --build        (see docker-compose.yml)
+# Or:     docker build -t aILab . && docker run --rm -p 8080:8080 -v aILab-journals:/opt/aILab/journals aILab
+#
+# Journals, logs and documents live under /opt/aILab and are declared as
+# volumes so data survives the container. The heap defaults to 75% of the
+# container memory (conf/shrc.custom); set JAVA_OPTS to override, e.g.
+#   docker run -e JAVA_OPTS="-Xms4g -Xmx4g" ...
+
+# Stage 1: build the binary and resources JARs and package them as tarballs.
+FROM eclipse-temurin:21 AS builder
+
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends git nodejs npm maven \
+ && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+COPY . .
+
+# A checkout made without --recursive, or a copy of the repository such as the
+# one the Vercel Deploy button creates, has no foam3/ content. Fetch the branch
+# named in .gitmodules in that case.
+RUN [ -f foam3/pom.js ] || git clone --depth 1 \
+      -b "$(git config -f .gitmodules submodule.foam3.branch)" \
+      "$(git config -f .gitmodules submodule.foam3.url)" foam3
+RUN cd foam3 && npm install
+
+# JOURNALS: extra deployment journal sets, e.g. production or test; docker is
+# always appended. VERSION: shown by run-docker.sh, defaults to pom.js.
+ARG JOURNALS=
+ARG VERSION=
+RUN ./build.sh -J${JOURNALS:+${JOURNALS},}docker --build-docker-tar \
+ && ./build.sh -J${JOURNALS:+${JOURNALS},}docker --build-resources-tar \
+ && echo "${VERSION:-$(grep -m1 "version:" pom.js | sed "s/.*'\(.*\)'.*/\1/")}" > build/package/VERSION
+
+# Stage 2: runtime. JDK rather than JRE: foam.core.script.Script runs JShell
+# in-process and needs jdk.jshell and jdk.compiler.
+FROM eclipse-temurin:21
+
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends unzip \
+ && rm -rf /var/lib/apt/lists/*
+
+COPY --from=builder /app/build/package/ /tmp/package/
+RUN mkdir -p /tmp/extract \
+ && for t in /tmp/package/*.tar.gz; do tar -xzf "$t" -C /tmp/extract; done \
+ && /tmp/extract/bin/install-docker.sh -A /opt/aILab -E /tmp/extract -N aILab -V "$(cat /tmp/package/VERSION)" \
+ && cp /tmp/package/VERSION /opt/aILab/VERSION \
+ && mkdir -p /opt/aILab/journals /opt/aILab/documents /opt/aILab/logs \
+ && rm -rf /tmp/extract /tmp/package
+
+VOLUME ["/opt/aILab/journals", "/opt/aILab/documents", "/opt/aILab/logs"]
+
+ENV WEB_PORT=8080
+EXPOSE 8080
+
+WORKDIR /opt/aILab
+CMD ["bash", "-c", "exec bin/run-docker.sh -A /opt/aILab -N aILab -V \"$(cat VERSION)\" -W \"${WEB_PORT}\""]
