@@ -19,6 +19,9 @@ The material builds up step by step:
 This repository is a FOAM application that you run to try out each example.
 The documentation, including tutorials, guides and foundational concepts, is in [`/doc`](doc/).
 
+New here? Start with the video
+[Neural Nets Demystified](https://www.youtube.com/watch?v=5WQdctBUO6M).
+
 ## Getting started
 
 1. Install FOAM by following the [foam3 INSTALL guide](https://github.com/foam-foundation/foam3/blob/development/INSTALL.md).

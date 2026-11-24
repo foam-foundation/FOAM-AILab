@@ -13,6 +13,7 @@ step with worked examples. No prior calculus or programming is needed.
 
 - [Neural Network Training Demystified](foundations/Neural-Network-Training-Demystified.md):
   from gradient descent and backpropagation to training a language model.
+  Also available as a video: [Neural Nets Demystified](https://www.youtube.com/watch?v=5WQdctBUO6M).
 
 ## License
 
