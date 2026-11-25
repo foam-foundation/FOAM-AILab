@@ -6,6 +6,21 @@ holds all of the learning material, including tutorials, guides and
 foundational concepts, much of it paired with examples you can run in the
 FOAM-AILab application.
 
+> [!NOTE]
+> **Lessons are being added gradually, about one per week.** The series is in
+> progress, so not every lesson is available yet. Check the
+> [roadmap](lessons/README.md#roadmap) to see which lessons are out, and
+> [follow along](../README.md#follow-along) to be notified when the next one is released.
+
+## Lessons
+
+Build FOAM-AILab step by step: generate a training dataset from source code,
+fine-tune a language model on it, measure the result, and share it on
+Hugging Face. Each lesson ends with a running application.
+
+- [Lessons roadmap](lessons/README.md): what you'll build, what you need,
+  and the full list of lessons.
+
 ## Foundations
 
 The underlying computer science and math behind AI models, explained step by
