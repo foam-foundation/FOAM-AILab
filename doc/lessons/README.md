@@ -65,6 +65,8 @@ Every lesson works with Ollama.
 3. **Compare when stuck.** `git diff lesson-02 lesson-03` shows everything
    lesson 3 changes.
 
+Build and development tips are collected on the [Tips](tips.md) page.
+
 Each lesson has the same parts: the goal, what you need before you start,
 links to the concepts it uses, the steps, a checkpoint to confirm everything
 works, troubleshooting, and a link to the next lesson. If a tag is ever moved
