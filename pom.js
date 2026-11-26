@@ -8,6 +8,7 @@
 foam.POM({
   name: 'aILab',
   excludes: [ '*' ],
+  setFlags: { ml: true }, // FOAM's AI model training features: ML Lab menus, dataset and training models
   projects: [
     { name: 'foam3/pom'},
     { name: 'src/com/foamdev/ailab/pom'},

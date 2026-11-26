@@ -1,4 +1,4 @@
-// defautl password: demopassword
+// default password: demopassword
 p({
   "class":"foam.core.auth.User",
   "id": 79906623,

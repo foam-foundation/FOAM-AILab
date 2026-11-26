@@ -21,3 +21,4 @@ p({class:"foam.core.auth.GroupPermissionJunction",sourceId:"aILab",targetId:"aIL
 p({class:"foam.core.auth.GroupPermissionJunction",sourceId:"aILab",targetId:"aILab.update.*"})
 p({class:"foam.core.auth.GroupPermissionJunction",sourceId:"aILab",targetId:"aILab.delete.*"})
 p({class:"foam.core.auth.GroupPermissionJunction",sourceId:"aILab",targetId:"menu.read.aILab.aILab"})
+p({class:"foam.core.auth.GroupPermissionJunction",sourceId:"aILab",targetId:"menu.read.aILab.about"})

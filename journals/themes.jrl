@@ -6,5 +6,5 @@ p({
   "name":"aILab",
   "registrationGroup":"aILab",
   "appName":"AILab",
-  "defaultMenu": ["aILab.aILab"]
+  "defaultMenu": ["aILab.about"]
 })
