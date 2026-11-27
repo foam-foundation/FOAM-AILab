@@ -1,19 +1,5 @@
 p({
   "class":"foam.core.menu.Menu",
-  "id":"aILab.aILab",
-  "label":"AILab",
-  "authenticate":true,
-  "keywords":[""],
-  "handler":{
-    "class":"foam.core.menu.DAOMenu2",
-    "config":{
-      "class":"foam.comics.v2.DAOControllerConfig",
-      "daoKey":"aILabDAO"
-    }
-  }
-})
-p({
-  "class":"foam.core.menu.Menu",
   "id":"aILab.about",
   "label":"About",
   "authenticate":true,

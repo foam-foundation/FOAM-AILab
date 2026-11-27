@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="150" viewBox="0 0 960 150" role="img" aria-label="The FOAM-AILab training pipeline: source code, training samples, review, measure base model, fine-tune, evaluate, serve, publish">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#57606a"/></marker></defs>
+<rect x="0.5" y="0.5" width="959" height="149" rx="10" fill="#ffffff" stroke="#d0d7de"/>
+<text x="185.0" y="34" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1e40af">Build the dataset</text>
+<line x1="17" y1="44" x2="353" y2="44" stroke="#2563eb" stroke-width="2"/>
+<text x="539.0" y="34" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#166534">Train and measure</text>
+<line x1="371" y1="44" x2="707" y2="44" stroke="#16a34a" stroke-width="2"/>
+<text x="834.0" y="34" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#92400e">Use and share</text>
+<line x1="725" y1="44" x2="943" y2="44" stroke="#d97706" stroke-width="2"/>
+<rect x="17" y="62" width="100" height="56" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+<text x="67.0" y="86" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#1f2328">Source</text>
+<text x="67.0" y="104" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#1f2328">code</text>
+<line x1="119" y1="90.0" x2="133" y2="90.0" stroke="#57606a" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="135" y="62" width="100" height="56" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+<text x="185.0" y="86" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#1f2328">Training</text>
+<text x="185.0" y="104" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#1f2328">samples</text>
+<line x1="237" y1="90.0" x2="251" y2="90.0" stroke="#57606a" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="253" y="62" width="100" height="56" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+<text x="303.0" y="95" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#1f2328">Review</text>
+<line x1="355" y1="90.0" x2="369" y2="90.0" stroke="#57606a" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="371" y="62" width="100" height="56" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+<text x="421.0" y="86" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#1f2328">Measure</text>
+<text x="421.0" y="104" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#1f2328">base model</text>
+<line x1="473" y1="90.0" x2="487" y2="90.0" stroke="#57606a" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="489" y="62" width="100" height="56" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+<text x="539.0" y="95" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#1f2328">Fine-tune</text>
+<line x1="591" y1="90.0" x2="605" y2="90.0" stroke="#57606a" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="607" y="62" width="100" height="56" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+<text x="657.0" y="95" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#1f2328">Evaluate</text>
+<line x1="709" y1="90.0" x2="723" y2="90.0" stroke="#57606a" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="725" y="62" width="100" height="56" rx="8" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+<text x="775.0" y="95" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#1f2328">Serve</text>
+<line x1="827" y1="90.0" x2="841" y2="90.0" stroke="#57606a" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="843" y="62" width="100" height="56" rx="8" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+<text x="893.0" y="95" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#1f2328">Publish</text>
+<text x="480.0" y="140" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#57606a">From FOAM source code to a published, fine-tuned model</text>
+</svg>

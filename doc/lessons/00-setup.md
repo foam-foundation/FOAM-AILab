@@ -1,4 +1,4 @@
-# Lesson 0: Setup and the plan
+  # Lesson 0: Setup and the plan
 
 In this lesson you get FOAM-AILab running, turn on FOAM's AI model training
 features, and give the app a welcome page. Along the way you see where the
@@ -19,7 +19,7 @@ the hardware notes in the [lessons overview](README.md#hardware).
 
 By the end of the series, FOAM-AILab runs a complete training pipeline:
 
-source code → training samples → review → measure the base model → fine-tune → evaluate → serve → publish
+![The training pipeline: source code, training samples, review, measure the base model, fine-tune, evaluate, serve, publish](images/00-pipeline.svg)
 
 The heart of it is the **training sample**. We use the Alpaca format: an
 instruction, an optional input, and the output the model should learn to give.
@@ -35,9 +35,10 @@ This is the sample the foundations guide follows through one training step
 ```
 
 Our samples are about FOAM code instead of capitals, but the shape is the same.
-Steps 1 and 2 of that section show what happens to a sample before training:
-it is turned into one piece of text, split into tokens, and paired with the
-tokens the model must predict.
+The foundations guide then shows what happens to a sample before training:
+
+- [Step 1: Format and tokenize][demystified-step1]: the three fields become one piece of text, which is split into tokens. [How text becomes numbers][demystified-tokenizers] explains tokenizers.
+- [Step 2: Inputs and targets][demystified-step2]: each token is paired with the token the model must predict next.
 
 A few decisions hold for the whole series:
 
@@ -54,7 +55,17 @@ submodule and check out the starting point:
 git clone --recurse-submodules git@github.com:<your-account>/FOAM-AILab.git
 cd FOAM-AILab
 git checkout start
+git submodule update
 ```
+
+> [!IMPORTANT]
+> Don't leave out `--recurse-submodules`. FOAM itself lives in the `foam3`
+> folder, a git submodule, and a plain `git clone` leaves that folder empty: the
+> build then fails. If that happened, run `git submodule update --init`.
+>
+> `git submodule update` after `git checkout start` matters too: it moves
+> `foam3` to the FOAM version that `start` uses. Run it every time you check out
+> a lesson tag.
 
 This uses SSH, like the FOAM tutorial's [Initial Setup][tutorial-setup]. If
 you haven't set up SSH keys with GitHub yet, see the
@@ -88,7 +99,7 @@ so its logins are public: `admin` / `ailab` and `demo` / `demopassword`. A real
 deployment uses real passwords.
 
 You see the app as the FOAM generator created it: an **AILab** menu with a
-placeholder model, and FOAM's standard admin menus. There's no sign of
+default model, and FOAM's standard admin menus. There's no sign of
 anything to do with training models.
 
 > 🐒 **Curious?** An app like this one is made by FOAM's project generator.
@@ -228,6 +239,38 @@ Click **Save**. The new row has fields you didn't fill in:
 - **Char count**: 58, the length of the three fields together.
 - **Status**: **New**.
 
+FOAM generates this create screen automatically from its `AlpacaSample` model.
+Here is a snippet of that model, shortened to the properties that matter now:
+
+```js
+foam.CLASS({
+  package: 'foam.core.ai.dataset',
+  name: 'AlpacaSample',
+
+  properties: [
+    {
+      class: 'String',
+      name: 'id',
+      createVisibility: 'HIDDEN',
+      updateVisibility: 'RO',
+      javaFactory: 'return hash_(getInstruction() + getOutput());'
+    },
+    { class: 'String', name: 'instruction', required: true },
+    { class: 'String', name: 'input' },
+    { class: 'String', name: 'output', required: true },
+    { class: 'Int',    name: 'charCount', createVisibility: 'HIDDEN' },
+    { class: 'Enum', of: 'foam.core.ai.dataset.AlpacaSampleStatus', name: 'status', value: 'NEW', createVisibility: 'HIDDEN' }
+  ]
+});
+```
+
+The three Alpaca fields are the only ones the create form shows; the others are
+`HIDDEN` there. The `javaFactory` computes the id on the server when the sample
+is saved. The full model is
+[`foam3/src/foam/core/ai/dataset/AlpacaSample.js`][alpaca-sample]; for how FOAM
+models work, see [Understanding FOAM Models][tutorial-models] in the FOAM
+tutorial.
+
 Char count and status are set by a FOAM **rule** that runs when a sample is
 created. You'll write rules of your own in lesson 5.
 
@@ -245,8 +288,9 @@ leave the row; lesson 5 covers what Discarded means.
 
 ## 8. A welcome page
 
-The app still opens on the placeholder AILab screen. Let's give it a page that
-says what the app is. In FOAM, a page of text can be a **Markdown flow**: a
+The app still opens on the **AILab** screen, the generator's default. A new
+user learns more from a page that says what the app is, so let's make that the
+landing page instead. In FOAM, a page of text can be a **Markdown flow**: a
 `.md` file that starts with a `<flow>` tag. The build turns it into a flow, and
 a menu can show it.
 
@@ -271,7 +315,9 @@ The tag's attributes:
 The page lives next to the app's code, not in `journals/`: that folder holds
 `.jrl` data, and the build finds `.md` files in any folder of the app's POM.
 
-Next, a menu that opens the flow. Add to `journals/menus.jrl`:
+Next, the menu. In `journals/menus.jrl`, replace the generated `aILab.aILab`
+entry (the one with `"label":"AILab"` and a `DAOMenu2` handler) with a menu
+that opens the flow:
 
 ```js
 p({
@@ -298,7 +344,8 @@ Make it the page the app opens on. In `journals/themes.jrl`, change
 "defaultMenu": ["aILab.about"],
 ```
 
-And let demo see the menu. Add to `journals/groupPermissionJunctions.jrl`:
+And let demo see the new menu. In `journals/groupPermissionJunctions.jrl`,
+replace the permission for the old menu, `menu.read.aILab.aILab`, with:
 
 ```js
 p({class:"foam.core.auth.GroupPermissionJunction",sourceId:"aILab",targetId:"menu.read.aILab.about"})
@@ -330,8 +377,8 @@ such as `flo`, in the search box above the menu.)
 ## 9. Checkpoint
 
 - [ ] The build log shows `Setting flag: ml = true`.
-- [ ] Admin lands on the About page and sees **ML Lab** with eight screens.
-- [ ] Demo lands on the About page and sees no ML Lab.
+- [ ] Admin lands on the About page and sees **ML Lab** with eight screens, and no **AILab** menu.
+- [ ] Demo lands on the About page and sees only **About**.
 - [ ] The Dataset has no samples, or only the France sample, Discarded.
 
 Compare with the `lesson-00` tag: `git diff start lesson-00`.
@@ -353,13 +400,12 @@ See also the [Tips](tips.md) page.
 [Lesson 1: Credentials and the vault](README.md#roadmap): store your Hugging
 Face token safely.
 
-The AILab placeholder model stays in the app; it does no harm. If you'd like to
-remove it, see [Removing the placeholder model](appendix-remove-placeholder.md).
-
 [foam-tutorial]: https://github.com/foam-foundation/foam3/blob/development/doc/tutorials/foam-tutorial.md
 [tutorial-generate]: https://github.com/foam-foundation/foam3/blob/development/doc/tutorials/foam-tutorial.md#generate-application
 [tutorial-menus]: https://github.com/foam-foundation/foam3/blob/development/doc/tutorials/foam-tutorial.md#menu-navigation
 [spid-guide]: https://github.com/foam-foundation/foam3/blob/development/doc/guides/SPID.md
+[alpaca-sample]: https://github.com/foam-foundation/foam3/blob/development/src/foam/core/ai/dataset/AlpacaSample.js
+[tutorial-models]: https://github.com/foam-foundation/foam3/blob/development/doc/tutorials/foam-tutorial.md#understanding-foam-models
 [tutorial-setup]: https://github.com/foam-foundation/foam3/blob/development/doc/tutorials/foam-tutorial.md#initial-setup
 [github-ssh]: https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent
 [journal-merging]: https://github.com/foam-foundation/foam3/blob/development/doc/tutorials/foam-tutorial.md#journal-merging-in-depth
@@ -367,6 +413,9 @@ remove it, see [Removing the placeholder model](appendix-remove-placeholder.md).
 [flags-guide]: https://github.com/foam-foundation/foam3/blob/development/doc/guides/Flags.md
 [demystified]: ../foundations/Neural-Network-Training-Demystified.md
 [demystified-sample]: ../foundations/Neural-Network-Training-Demystified.md#the-sample
+[demystified-step1]: ../foundations/Neural-Network-Training-Demystified.md#step-1-format-and-tokenize
+[demystified-tokenizers]: ../foundations/Neural-Network-Training-Demystified.md#tokenizers-how-text-becomes-numbers
+[demystified-step2]: ../foundations/Neural-Network-Training-Demystified.md#step-2-inputs-and-targets-teacher-forcing
 [demystified-loop]: ../foundations/Neural-Network-Training-Demystified.md#the-training-loop
 [demystified-gd]: ../foundations/Neural-Network-Training-Demystified.md#2-gradient-descent
 [demystified-loss]: ../foundations/Neural-Network-Training-Demystified.md#step-5-the-loss-for-each-token
