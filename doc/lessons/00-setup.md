@@ -1,4 +1,4 @@
-  # Lesson 0: Setup and the plan
+# Lesson 0: Setup and the plan
 
 In this lesson you get FOAM-AILab running, turn on FOAM's AI model training
 features, and give the app a welcome page. Along the way you see where the
@@ -10,7 +10,7 @@ series is going and what each new screen will be used for.
 - How flags decide which journal files go into the build
 - How a Markdown file becomes a page in the app (a Markdown flow)
 
-**Before you start:** complete the [FOAM tutorial][foam-tutorial] and check
+**Before you start:** complete the [FOAM tutorial](https://github.com/foam-foundation/foam3/blob/development/doc/tutorials/foam-tutorial.md) and check
 the hardware notes in the [lessons overview](README.md#hardware).
 
 **Starting point:** the `start` tag. **End state:** the `lesson-00` tag.
@@ -24,7 +24,7 @@ By the end of the series, FOAM-AILab runs a complete training pipeline:
 The heart of it is the **training sample**. We use the Alpaca format: an
 instruction, an optional input, and the output the model should learn to give.
 This is the sample the foundations guide follows through one training step
-([§5 *The sample*][demystified-sample]):
+([§5 *The sample*](../foundations/Neural-Network-Training-Demystified.md#the-sample)):
 
 ```json
 {
@@ -37,12 +37,12 @@ This is the sample the foundations guide follows through one training step
 Our samples are about FOAM code instead of capitals, but the shape is the same.
 The foundations guide then shows what happens to a sample before training:
 
-- [Step 1: Format and tokenize][demystified-step1]: the three fields become one piece of text, which is split into tokens. [How text becomes numbers][demystified-tokenizers] explains tokenizers.
-- [Step 2: Inputs and targets][demystified-step2]: each token is paired with the token the model must predict next.
+- [Step 1: Format and tokenize](../foundations/Neural-Network-Training-Demystified.md#step-1-format-and-tokenize): the three fields become one piece of text, which is split into tokens. [How text becomes numbers](../foundations/Neural-Network-Training-Demystified.md#tokenizers-how-text-becomes-numbers) explains tokenizers.
+- [Step 2: Inputs and targets](../foundations/Neural-Network-Training-Demystified.md#step-2-inputs-and-targets-teacher-forcing): each token is paired with the token the model must predict next.
 
 A few decisions hold for the whole series:
 
-- **Training runs on [MLX](https://github.com/ml-explore/mlx)** on Apple Silicon Macs, with a small model (Qwen2.5-Coder-1.5B by default; see [Hardware](README.md#hardware)).
+- **Training runs on** [MLX](https://github.com/ml-explore/mlx) on Apple Silicon Macs, with a small model (Qwen2.5-Coder-1.5B by default; see [Hardware](README.md#hardware)).
 - **Samples are written by an LLM**: [Ollama](https://ollama.com) for free on your own machine, or a paid API for better samples. Every lesson works with Ollama.
 - **The training data comes from public FOAM source code**, so you can share your dataset and model when you're done.
 
@@ -67,9 +67,9 @@ git submodule update
 > `foam3` to the FOAM version that `start` uses. Run it every time you check out
 > a lesson tag.
 
-This uses SSH, like the FOAM tutorial's [Initial Setup][tutorial-setup]. If
+This uses SSH, like the FOAM tutorial's [Initial Setup](https://github.com/foam-foundation/foam3/blob/development/doc/tutorials/foam-tutorial.md#initial-setup). If
 you haven't set up SSH keys with GitHub yet, see the
-[GitHub SSH guide][github-ssh].
+[GitHub SSH guide](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent).
 
 Build and start the app with the demo deployment:
 
@@ -94,7 +94,7 @@ runtime journals: leave out `-j`, or answer `b`.
 
 More build tips are collected on the [Tips](tips.md) page.
 
-Open <http://localhost:8080> and log in as **admin**. This is a learning app,
+Open [http://localhost:8080](http://localhost:8080) and log in as **admin**. This is a learning app,
 so its logins are public: `admin` / `ailab` and `demo` / `demopassword`. A real
 deployment uses real passwords.
 
@@ -109,7 +109,7 @@ default model, and FOAM's standard admin menus. There's no sign of
 anything to do with training models.
 
 > 🐒 **Curious?** An app like this one is made by FOAM's project generator.
-> See [Generate Application][tutorial-generate] in the FOAM tutorial.
+> See [Generate Application](https://github.com/foam-foundation/foam3/blob/development/doc/tutorials/foam-tutorial.md#generate-application) in the FOAM tutorial.
 
 ![Admin's menu before the ML features are turned on](images/00-admin-before-ml.png)
 
@@ -140,9 +140,9 @@ projects: [
 ```
 
 The `flags: 'ml'` on the last two entries means: include this sub-POM only
-when the **`ml` flag** is on. It is off by default. (LLMs and vector search,
+when the `ml` flag is on. It is off by default. (LLMs and vector search,
 the first three entries, are always included. The series uses them as they
-are; see the [FOAM guides][foam-guides].)
+are; see the [FOAM guides](https://github.com/foam-foundation/foam3/tree/development/doc/guides).)
 
 ## 4. The quick way: a command-line flag
 
@@ -156,7 +156,7 @@ Log in as admin, and an **ML Lab** menu appears. It works, but only for this
 build: run `./build.sh -Jdemo -jc` again and ML Lab is gone. Every build, by
 you or anyone else who clones the app, has to remember the flag.
 
-## 5. The proper way: `setFlags` in the app's POM
+## 5. The proper way: setFlags in the app's POM
 
 This app needs ML Lab on every build, so the app should say so itself. Open
 the root `pom.js` and add `setFlags` after `excludes`:
@@ -186,7 +186,7 @@ no effect now. The order, highest first:
 3. The command line (`--flags:`)
 4. Defaults
 
-See the [Flags guide][flags-guide] for the details.
+See the [Flags guide](https://github.com/foam-foundation/foam3/blob/development/doc/guides/Flags.md) for the details.
 
 ## 6. Refresher: flags and journals
 
@@ -202,7 +202,7 @@ As a reminder of how the build puts journals together:
 - Deployment journals (`-Jdemo` → `deployment/demo`) are merged after, so they can add or replace entries; the last one wins.
 - Runtime journals, the changes you make while the app runs, are replayed on top.
 
-The tutorial's appendix [Journal Merging In-Depth][journal-merging] has the
+The tutorial's appendix [Journal Merging In-Depth](https://github.com/foam-foundation/foam3/blob/development/doc/tutorials/foam-tutorial.md#journal-merging-in-depth) has the
 full story.
 
 Log in as admin again. ML Lab now has eight screens:
@@ -215,15 +215,15 @@ with the dataset is the subject of lesson 5.
 ## 7. A tour of ML Lab
 
 The screens are empty for now. Each one holds a part of the pipeline, and
-most of them connect to an idea in the [foundations guide][demystified]:
+most of them connect to an idea in the [foundations guide](../foundations/Neural-Network-Training-Demystified.md):
 
 | Screen | What it holds | The theory behind it | Filled in |
 |---|---|---|---|
-| Dataset | Training samples: instruction, input, output, source file, status | [§5 *The sample*][demystified-sample]: the same Alpaca record | Lesson 4, cleaned in 5 |
+| Dataset | Training samples: instruction, input, output, source file, status | [§5 *The sample*](../foundations/Neural-Network-Training-Demystified.md#the-sample): the same Alpaca record | Lesson 4, cleaned in 5 |
 | Scripts / Jobs | The work: crawl, generate, train, evaluate | (FOAM, not theory) | Lesson 3 onward |
 | Eval Prompts | Test questions, each with the patterns a good answer must contain | Measure before you change anything | Lesson 6 |
-| Training Runs | One row per run: base model, dataset, final loss, best checkpoint | [§6 *The training loop*][demystified-loop] | Lesson 7 |
-| Training Metrics | Training and validation loss at each step | [§2 Gradient descent][demystified-gd]; [§5 Step 5][demystified-loss] (the loss for each token) | Lesson 7 |
+| Training Runs | One row per run: base model, dataset, final loss, best checkpoint | [§6 *The training loop*](../foundations/Neural-Network-Training-Demystified.md#the-training-loop) | Lesson 7 |
+| Training Metrics | Training and validation loss at each step | [§2 Gradient descent](../foundations/Neural-Network-Training-Demystified.md#2-gradient-descent); [§5 Step 5](../foundations/Neural-Network-Training-Demystified.md#step-5-the-loss-for-each-token) (the loss for each token) | Lesson 7 |
 | Eval Runs / Results | Pass rate per model, and each answer with the patterns it hit | Did the model actually learn? | Lessons 6 and 8 |
 
 Validation loss, checkpoints and LoRA are explained in lesson 7.
@@ -273,8 +273,8 @@ foam.CLASS({
 The three Alpaca fields are the only ones the create form shows; the others are
 `HIDDEN` there. The `javaFactory` computes the id on the server when the sample
 is saved. The full model is
-[`foam3/src/foam/core/ai/dataset/AlpacaSample.js`][alpaca-sample]; for how FOAM
-models work, see [Understanding FOAM Models][tutorial-models] in the FOAM
+[`foam3/src/foam/core/ai/dataset/AlpacaSample.js`](https://github.com/foam-foundation/foam3/blob/development/src/foam/core/ai/dataset/AlpacaSample.js); for how FOAM
+models work, see [Understanding FOAM Models](https://github.com/foam-foundation/foam3/blob/development/doc/tutorials/foam-tutorial.md#understanding-foam-models) in the FOAM
 tutorial.
 
 Char count and status are set by a FOAM **rule** that runs when a sample is
@@ -311,11 +311,11 @@ ordinary Markdown:
 Learn how AI models are trained by building one end to end. ...
 ```
 
-Write your own text, or copy the page from the [`lesson-00` tag][about-md].
+Write your own text, or copy the page from the [`lesson-00` tag](https://github.com/foam-foundation/FOAM-AILab/blob/lesson-00/src/com/foamdev/ailab/About.md).
 The tag's attributes:
 
 - `name`: the flow's id. Our flows start with `AILab:`, the way foam3's use prefixes such as `MCP:`.
-- `spid`: the service provider the flow belongs to. Demo can only read data of the `aILab` service provider; without this attribute, demo would see an empty page. See the [SPID guide][spid-guide] for how service providers work.
+- `spid`: the service provider the flow belongs to. Demo can only read data of the `aILab` service provider; without this attribute, demo would see an empty page. See the [SPID guide](https://github.com/foam-foundation/foam3/blob/development/doc/guides/SPID.md) for how service providers work.
 - `accessLevel="PUBLIC_RO"`: every user can read it, and nobody can change it.
 
 The page lives next to the app's code, not in `journals/`: that folder holds
@@ -341,7 +341,7 @@ p({
 `FlowMenu` shows the flow as a page (in presentation mode, without REFLOW's
 editing tools). It is one of several menu **handlers**, each opening a
 different kind of screen; the FOAM tutorial's
-[Menu Navigation][tutorial-menus] section lists the others.
+[Menu Navigation](https://github.com/foam-foundation/foam3/blob/development/doc/tutorials/foam-tutorial.md#menu-navigation) section lists the others.
 
 Make it the page the app opens on. In `journals/themes.jrl`, change
 `defaultMenu`:
@@ -393,9 +393,9 @@ Compare with the `lesson-00` tag: `git diff start lesson-00`.
 
 See also the [Tips](tips.md) page.
 
-- **No ML Lab after adding `setFlags`.** The build may be stale; build again with `-c`.
-- **The build behaves strangely, or still shows old classes after `-c`.** Remove the whole build output and rebuild it without starting the server: `./build.sh -XcleanAll -o` (`-XcleanAll` removes `build/` and the app's `lib/`; `-o` builds only). Then build as usual.
-- **`foam: malformed flags`.** A flag expression has spaces in it, such as `--flags:"ml, dev"`. Write it without spaces.
+- **No ML Lab** after adding `setFlags`. The build may be stale; build again with `-c`.
+- **The build behaves strangely**, or still shows old classes after `-c`. Remove the whole build output and rebuild it without starting the server: `./build.sh -XcleanAll -o` (`-XcleanAll` removes `build/` and the app's `lib/`; `-o` builds only). Then build as usual.
+- `foam: malformed flags`. A flag expression has spaces in it, such as `--flags:"ml, dev"`. Write it without spaces.
 - **The build fails on missing foam3 files.** The submodule isn't checked out: run `git submodule update --init`.
 - **No ML Lab, but the build log shows the flag.** You're logged in as demo; log in as admin.
 - **Port 8080 is in use.** Another copy of the app (or something else) is running. Stop it and build again.
@@ -405,24 +405,3 @@ See also the [Tips](tips.md) page.
 
 [Lesson 1: Credentials and the vault](README.md#roadmap): store your Hugging
 Face token safely.
-
-[foam-tutorial]: https://github.com/foam-foundation/foam3/blob/development/doc/tutorials/foam-tutorial.md
-[tutorial-generate]: https://github.com/foam-foundation/foam3/blob/development/doc/tutorials/foam-tutorial.md#generate-application
-[tutorial-menus]: https://github.com/foam-foundation/foam3/blob/development/doc/tutorials/foam-tutorial.md#menu-navigation
-[spid-guide]: https://github.com/foam-foundation/foam3/blob/development/doc/guides/SPID.md
-[alpaca-sample]: https://github.com/foam-foundation/foam3/blob/development/src/foam/core/ai/dataset/AlpacaSample.js
-[tutorial-models]: https://github.com/foam-foundation/foam3/blob/development/doc/tutorials/foam-tutorial.md#understanding-foam-models
-[tutorial-setup]: https://github.com/foam-foundation/foam3/blob/development/doc/tutorials/foam-tutorial.md#initial-setup
-[github-ssh]: https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent
-[journal-merging]: https://github.com/foam-foundation/foam3/blob/development/doc/tutorials/foam-tutorial.md#journal-merging-in-depth
-[foam-guides]: https://github.com/foam-foundation/foam3/tree/development/doc/guides
-[flags-guide]: https://github.com/foam-foundation/foam3/blob/development/doc/guides/Flags.md
-[demystified]: ../foundations/Neural-Network-Training-Demystified.md
-[demystified-sample]: ../foundations/Neural-Network-Training-Demystified.md#the-sample
-[demystified-step1]: ../foundations/Neural-Network-Training-Demystified.md#step-1-format-and-tokenize
-[demystified-tokenizers]: ../foundations/Neural-Network-Training-Demystified.md#tokenizers-how-text-becomes-numbers
-[demystified-step2]: ../foundations/Neural-Network-Training-Demystified.md#step-2-inputs-and-targets-teacher-forcing
-[demystified-loop]: ../foundations/Neural-Network-Training-Demystified.md#the-training-loop
-[demystified-gd]: ../foundations/Neural-Network-Training-Demystified.md#2-gradient-descent
-[demystified-loss]: ../foundations/Neural-Network-Training-Demystified.md#step-5-the-loss-for-each-token
-[about-md]: https://github.com/foam-foundation/FOAM-AILab/blob/lesson-00/src/com/foamdev/ailab/About.md
