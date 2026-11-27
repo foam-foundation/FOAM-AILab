@@ -98,6 +98,12 @@ Open <http://localhost:8080> and log in as **admin**. This is a learning app,
 so its logins are public: `admin` / `ailab` and `demo` / `demopassword`. A real
 deployment uses real passwords.
 
+> [!IMPORTANT]
+> Don't see a change you just made? Do a **hard reload**: <kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd>
+> on a Mac, <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd> on Windows and Linux. The browser keeps
+> copies of the app's files, and a normal reload may still show the old ones.
+> Make it a habit after every build.
+
 You see the app as the FOAM generator created it: an **AILab** menu with a
 default model, and FOAM's standard admin menus. There's no sign of
 anything to do with training models.

@@ -3,6 +3,10 @@
 Short, practical tips for working on FOAM-AILab, collected as the lessons go.
 Each lesson links here instead of repeating them.
 
+## Browser
+
+- **Not seeing your change? Hard reload.** <kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd> on a Mac, <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd> on Windows and Linux. The browser keeps copies of the app's files, and a normal reload may still show the old ones. Do it after every build.
+
 ## Building
 
 ### The usual build
@@ -63,6 +67,10 @@ turns it into a page in the app (lesson 0).
 - **Changing the `<flow>` tag needs a rebuild**, for example a new `spid` or `accessLevel`.
 - **Set `spid="aILab"`** in the tag. Without it, users other than admin see an empty page (see the [SPID guide](https://github.com/foam-foundation/foam3/blob/development/doc/guides/SPID.md)).
 - **Write each list item on one line.** FOAM's Markdown view doesn't yet continue a list item onto the next line.
+
+## Reading the docs on GitHub
+
+- **A link lands a little above or below its heading.** GitHub jumps to the heading before the images and math above it have loaded; as they appear, the text moves. Click the link again once the page has loaded and it lands exactly.
 
 ## Server
 
